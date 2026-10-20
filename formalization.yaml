@@ -1,0 +1,174 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+version: "v0.4"
+
+project:
+  name: "Erdős Problem 420: divisor counts of shifted factorials"
+  description: >-
+    A Lean proof that for every monotone f with f(n) → ∞ and f(n) ≤ log n
+    eventually, the values F(f, n) = τ((n + ⌊f(n)⌋)!) / τ(n!) over n ≥ N are
+    dense in (1, ∞) for every N. In particular F(log n, n) is dense in
+    (1, ∞). This answers the second and third questions of Erdős Problem 420.
+    The proof combines a protected covering, Maynard's sieve with a growing
+    CRT modulus, and a Selberg upper sieve. Its analytic input is a uniform
+    power-saving prime number theorem in progressions, derived in Lean from
+    the zero-free half-plane re s > 7/8, whose Lean proof from openai/math is
+    vendored. The first question is not addressed.
+  authors:
+    - "Jacob Parish"
+  license: "Apache-2.0"
+  responsible_maintainers:
+    - "Jacob Parish"
+
+classification:
+  arxiv: ["math.NT"]
+  msc2020: ["11N25", "11N36", "11N13", "11M26"]
+
+sources:
+  - title: "Old and new problems and results in combinatorial number theory"
+    authors: ["P. Erdős", "R. L. Graham"]
+    id: "Monographies de L'Enseignement Mathématique 28 (1980)"
+    type: "book"
+    relationship: "formalizes"
+    note: >-
+      Source of the questions.
+  - title: "Erdős Problem #420"
+    authors: ["Thomas F. Bloom"]
+    id: "https://www.erdosproblems.com/420"
+    relationship: "background"
+    note: >-
+      Accessed 2026-10-13. Bloom's catalog entry supplies the problem number
+      and statement. The discussion thread had no proof claims for the
+      density questions.
+  - title: "On the number of divisors of n!"
+    authors: ["P. Erdős", "S. W. Graham", "A. Ivić", "C. Pomerance"]
+    id: "Analytic Number Theory, Proc. Conf. in Honor of Heini Halberstam, Vol. 1 (1996), 337–355"
+    type: "paper"
+    relationship: "other"
+    note: >-
+      Theorem 2 (the divisor ratio of consecutive factorials) and the
+      protected covering in the proof of Theorem 3, both re-proved here in the
+      form needed.
+  - title: "Dense clusters of primes in subsets"
+    authors: ["James Maynard"]
+    id: "Compositio Math. 152 (2016), 1517–1554; arXiv:1405.2593"
+    type: "paper"
+    relationship: "other"
+    note: >-
+      Proposition 6.1 for forms with a growing CRT modulus, including the
+      roughness bound 6.1(4), proved here on top of PrimeGapsLib.
+  - title: "Small gaps between primes"
+    authors: ["James Maynard"]
+    id: "Ann. of Math. 181 (2015), 383–413"
+    type: "paper"
+    relationship: "other"
+    note: >-
+      The multidimensional sieve, formalized in PrimeGapsLib, and
+      Proposition 4.3 (M_k ≥ log k − 2 log log k − 2), proved here.
+  - title: "The Quasi-Riemann Hypothesis: A Zero-Free Half-Plane Re(s) > 7/8"
+    authors: ["OpenAI"]
+    id: "https://github.com/openai/math/blob/main/preprints/The-Quasi-Riemann-Hypothesis-September-30-2026/paper.pdf"
+    type: "paper"
+    relationship: "other"
+    note: >-
+      Theorem 1.1, the zero-free half-plane for Dirichlet L-functions. Its Lean
+      proof is vendored under vendor/OAI from openai/math commit
+      fd4aeeb2ee4fc729c18d98444fed42fd0529eeeb and ported to this toolchain.
+  - title: "PrimeGapsLib"
+    authors: ["Evan Chen", "Sidharth Hariharan", "Kenny Lau", "Bhavik Mehta", "Ken Ono", "Ashvin Swaminathan", "Jesse Thorner", "Yunzhou Xie"]
+    id: "https://github.com/AxiomMath/PrimeGapsLib"
+    relationship: "adapts"
+    note: >-
+      Maynard's sieve, vendored under vendor/PrimeGapsLib from commit
+      1faa7b14e82ddebc2772dfb9153922f01b106477, ported to this toolchain, and
+      generalized in place from the fixed W-trick modulus to a general modulus
+      with a power-saving level of distribution. Every statement change is
+      recorded in its README.
+  - title: "PrimeNumberTheoremAnd"
+    authors: ["Alex Kontorovich", "Terence Tao", "and contributors"]
+    id: "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd"
+    relationship: "adapts"
+    note: >-
+      The Perron formula, rectangle residue calculus, and the Wiener closure
+      used by the OAI library, vendored under vendor/PrimeNumberTheoremAnd
+      from commit c39a751132c88b6e8080b74c74023fd95b3d8be0.
+  - title: "rellich-kondrachov"
+    authors: ["Adam Benenson"]
+    id: "https://github.com/abenenson/rellich-kondrachov"
+    relationship: "adapts"
+    note: >-
+      The Rellich–Kondrachov closure used by the OAI library, vendored under
+      vendor/RellichKondrachov from commit
+      70f85d4c1bf99c6e7d61e8be4daa6f3664d08d23.
+
+status:
+  scope: >-
+    Comparator is configured to check two theorems: erdos_420.parts.iii
+    (density of F(f, n) over n ≥ N for monotone f ≤ log n eventually, f → ∞)
+    and erdos_420.parts.ii (density of F(log n, n)). The first question of
+    the problem, whether F((log n)^C, n) → ∞, is not addressed.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Quot.sound", "Classical.choice"]
+
+automation:
+  methods:
+    - method: "agent"
+      models: ["claude-opus-5-5"]
+      framework: "Claude Code"
+      tool_setup: "Lean 4.35.0-rc4, Mathlib, and Lake."
+      prompting_notes: >-
+        Asked to formalize the protected-CRT density argument and to vendor
+        the quasi-Riemann hypothesis formalization, unconditionally. Claude
+        Code planned the decomposition, wrote the interface statements and the
+        assembly, and assessed and generalized PrimeGapsLib. Parallel
+        subagents filled in the proofs.
+  notes: >-
+    The vendored OAI library was produced by an internal OpenAI model, and
+    PrimeGapsLib by Axiom Math's formalizers with AxiomProver, as recorded
+    upstream.
+
+fidelity:
+  divergences: >-
+    No formal statement of Problem 420 was available, so F and both
+    statements are written here. "Dense in (1, ∞)" is stated as
+    Set.Ioi 1 ⊆ closure (values of F). Part (iii) is slightly stronger than
+    the question: it assumes f(n) ≤ log n only for large n, and it uses only
+    the values with n ≥ N, for every N. Monotone is read as nondecreasing,
+    since a nonincreasing f cannot tend to infinity.
+
+review:
+  status: "agent-reviewed"
+  reviewers: []
+  notes: >-
+    On 2026-10-20, an independent reproduction rebuilt all 48 project
+    modules, Challenge, and Solution on Lean v4.35.0-rc4, using source-checked
+    caches for vendored dependencies. Comparator accepted both targets, and
+    separate empty-environment kernel replays checked their complete proof
+    closures. Both target types and all statement dependencies matched the
+    challenge. Neither closure contains unsafe or partial declarations; both
+    use only propext, Classical.choice, and Quot.sound. A separate
+    fresh-context agent review found both statements faithful to the two
+    density questions, and a distinct grader accepted that review. The
+    review does not cover the divergence question or independently reconstruct
+    the full prose argument. Detailed reproduction and statement-review
+    records are retained with the Problem 420 claim in the Erdős problems
+    corpus; they are not included in this repository.
+
+alignment:
+  namespace: "Erdos420"
+  statements:
+    - source: "Erdős Problem 420, third question"
+      lean: "Erdos420.erdos_420.parts.iii"
+      module: "Solution"
+      status: "proved"
+      note: >-
+        For monotone f with f → ∞ and f(n) ≤ log n eventually, and every N,
+        Set.Ioi 1 ⊆ closure (F f '' Set.Ici N).
+    - source: "Erdős Problem 420, second question"
+      lean: "Erdos420.erdos_420.parts.ii"
+      module: "Solution"
+      status: "proved"
+      note: >-
+        Set.Ioi 1 ⊆ closure (Set.range (F fun n ↦ log n)).
+
+acknowledgements: "Mathlib, openai/math, AxiomMath/PrimeGapsLib, PrimeNumberTheoremAnd, rellich-kondrachov, and the authors of the cited mathematical sources."
